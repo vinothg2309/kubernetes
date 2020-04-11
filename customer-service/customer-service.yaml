@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customer-service
+  labels:
+    name: customer-service
+    app: customer-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      appname: customer-service
+  template:
+    metadata:
+      name: customer-service
+      labels:
+        appname: customer-service
+    spec:
+      containers:
+        - name: customer-service
+          image: vinothg2309/customer-service
+          env:
+            - name: MONGODB_HOST
+              value: mongodb
+            - name: LOAN_SERVICE_URL
+              value: http://loan-service:801/loan/fetch
+            - name: VERSION
+              value: v1
+          ports:
+            - containerPort: 8103
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: customer-service
+  labels:
+    appname: customer-service
+spec:
+  selector:
+    appname: customer-service
+  type: LoadBalancer
+  ports:
+    - name: customer-service-port
+      protocol: TCP
+      port: 123
+      targetPort: 8103
