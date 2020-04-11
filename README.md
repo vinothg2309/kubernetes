@@ -23,5 +23,7 @@ Testing:
   Check the minikube IP address by executing "minikube IP" command. Make a call the below rest service to test the micro service deployed in Kubernetes. Test data for both customer and loan are pre-loaded while deploying the application.
 
   GET: http://[MINIKUBE IP]:[SERVICE NODE PORT]/customer/fetch - Fetch all customers.
+  
   GET: http://[MINIKUBE IP]:[SERVICE NODE PORT]/loan/fetch - Fetch all loan details.
+  
   GET: http://[MINIKUBE IP]:[SERVICE NODE PORT]//customer/getAllCustomersLoan - Fetch all customers and their loan details.      
