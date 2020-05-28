@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: suggestion-secret
+data:
+  mongodb-uri: bW9uZ29kYjovL2FkbWluOnBhc3N3b3JkQG1vbmdvZGI6MjcwMTcvZ3Vlc3Rib29rP2F1dGhTb3VyY2U9YWRtaW4=
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: suggestion-service
+  name: suggestion-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: suggestion-pod
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: suggestion
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: suggestion-pod 
+  template:
+    metadata:
+      labels:
+        app: suggestion-pod
+    spec:
+      containers:
+      - image: vinothg2309/suggestion-service
+        imagePullPolicy: Always
+        name: suggestion-container
+        ports:
+        - name: suggestion-port
+          containerPort: 8000
+        env:
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: suggestion-secret
+              key: mongodb-uri
+
