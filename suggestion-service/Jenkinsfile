@@ -5,6 +5,8 @@ pipeline {
         registry = "vinothg2309/suggestion-service"
         registryCredential = 'dockerhub'
         dockerImage = ''
+        mavenHome=''
+        mavenCMD=''
     }
    
     
@@ -27,10 +29,11 @@ pipeline {
         stage('mvn build'){
             steps{
                  dir('suggestion-service') {
-                    sh label: '', 
-                    script: '''
-                        mvn package
-                    '''
+                     script{
+                        mavenHome =  tool name: 'Maven', type: 'maven'
+                        mavenCMD = "${mavenHome}/bin/mvn clean package"
+                        sh "${mavenCMD}"
+                     }
                 }
                 
             }
@@ -65,7 +68,7 @@ pipeline {
                 dir('suggestion-service') {
                     sh label: '', 
                     script: """
-                        sudo kubectl delete -f suggestion-service-k8s.yaml
+                        kubectl delete -f suggestion-service-k8s.yaml
                     """
                 }
             }
@@ -76,7 +79,7 @@ pipeline {
                 dir('suggestion-service') {
                     sh label: '', 
                     script: """
-                       sudo kubectl create -f suggestion-service-k8s.yaml
+                        kubectl create -f suggestion-service-k8s.yaml
                     """
                 }
             }
