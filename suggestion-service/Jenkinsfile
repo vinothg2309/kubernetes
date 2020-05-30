@@ -1,0 +1,85 @@
+pipeline {
+    agent any
+    
+    environment {
+        registry = "vinothg2309/suggestion-service"
+        registryCredential = 'dockerhub'
+        dockerImage = ''
+    }
+   
+    
+    stages {
+       
+        stage('Env print'){
+            steps{
+                 sh label: '', 
+                script: """
+                    echo $env.registry .
+                """
+            }
+        }
+        stage('Git Checkout'){
+            steps{
+                git branch: 'master', url: 'https://github.com/vinothg2309/kubernetes.git'
+            }
+        }
+        
+        stage('mvn build'){
+            steps{
+                 dir('suggestion-service') {
+                    sh label: '', 
+                    script: '''
+                        mvn package
+                    '''
+                }
+                
+            }
+        }
+        
+        stage('Docker build'){
+            steps{
+                dir('suggestion-service') {
+                    sh label: '', 
+                    script: """
+                        docker build -t $env.registry .
+                    """
+                }
+            }
+        }
+        
+        stage('Docker Push'){
+            steps{
+                dir('suggestion-service') {
+                    withCredentials([string(credentialsId: 'dockerhub_pwd', variable: 'DOCKER_HUB_PWD')]) {
+                        sh label: '', 
+                    script: """
+                        docker push $env.registry
+                    """
+                    }
+                }
+            }
+        }
+        
+        stage('Kubernetes delete'){
+            steps{
+                dir('suggestion-service') {
+                    sh label: '', 
+                    script: """
+                        sudo kubectl delete -f suggestion-service-k8s.yaml
+                    """
+                }
+            }
+        }
+        
+        stage('Kubernetes create'){
+            steps{
+                dir('suggestion-service') {
+                    sh label: '', 
+                    script: """
+                       sudo kubectl create -f suggestion-service-k8s.yaml
+                    """
+                }
+            }
+        }
+    }
+}
