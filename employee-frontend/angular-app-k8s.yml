@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: employee-frontend 
+  template:
+    metadata:
+      labels:
+        app: employee-frontend
+    spec:
+      containers:
+      - image: vinothg2309/employee-frontend
+        imagePullPolicy: Always
+        name: frontend
+        env:
+          - name: BACKEND_URI
+            value: http://backend.minikube.local
+        ports:
+        - name: frontend
+          containerPort: 4200
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: employee-frontend
+  name: employee-frontend
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 4200
+      targetPort: 4200
+  type: NodePort
+  selector:
+    app: employee-frontend
