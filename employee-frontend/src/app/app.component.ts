@@ -39,7 +39,7 @@ export class AppComponent {
     employee.isEdit = false
   }
 
-  save(employee: Employee){
+  onSubmit(employee: Employee){
     this.saveOrUpdateEmployee(employee)
   }
 
@@ -51,6 +51,7 @@ export class AppComponent {
       this.createNewEmployee = false;
     })
   }
+
 
   delete(id:number){
     this.http.delete(this.backendUrl+'/employee/delete/' + id,{responseType: 'text'})
@@ -72,4 +73,10 @@ export class AppComponent {
  cancelNew(){
   this.createNewEmployee = false;
  }
+
+ ageChanged(event){
+   this.newEmployee.age = event;
+ }
+ 
+
 }
