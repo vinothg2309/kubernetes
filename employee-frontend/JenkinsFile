@@ -1,0 +1,39 @@
+node{
+    
+    stage('Git Clone') {
+        git 'https://github.com/vinothg2309/kubernetes.git'
+        env.shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+        echo "shortCommit = ${shortCommit}"
+    }
+    
+    stage('Angular package'){
+        dir('employee-frontend') {
+           // sh "npm install --save-dev @angular-devkit/build-angular"
+            sh "ng build --prod"
+        }
+    }
+    
+    stage('Build Docker Image'){
+        dir('employee-frontend') {
+            env.IMAGE_NAME_WITH_TAG = "vinothg2309/employee-frontend:${shortCommit}"
+            sh "docker build . -t ${IMAGE_NAME_WITH_TAG}"
+        }
+    }
+    
+    stage('Docker Push'){
+        dir('employee-frontend') {
+            withCredentials([string(credentialsId: 'DOCKER_HUB_PWD', variable: 'dockerHubPwd')]) {
+                 sh "docker login -u vinothg2309 -p ${dockerHubPwd}"
+                 sh "docker push ${IMAGE_NAME_WITH_TAG}"
+            }
+        }
+    }
+    
+    stage('K8S Deploy'){
+     dir('employee-frontend') {
+          sh "chmod +x changeTag.sh"
+          sh "./changeTag.sh ${shortCommit}"
+          sh "kubectl apply -f angular-app-k8s-tagged.yml"   
+     }
+    }
+}
