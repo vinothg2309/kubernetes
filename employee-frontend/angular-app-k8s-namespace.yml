@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: employee-frontend
+  namespace: monitoring
 spec:
   replicas: 1
   selector:
@@ -13,7 +14,7 @@ spec:
         app: employee-frontend
     spec:
       containers:
-      - image: vinothg2309/employee-frontend:tagVersion
+      - image: vinothg2309/employee-frontend
         imagePullPolicy: Always
         name: frontend
         env:
@@ -28,7 +29,9 @@ kind: Service
 metadata:
   labels:
     name: employee-frontend
+    app: example-app # prometheus apps.service-monitor.yaml selector app: example-app
   name: employee-frontend
+  namespace: monitoring
 spec:
   ports:
     - protocol: "TCP"
