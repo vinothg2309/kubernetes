@@ -31,9 +31,12 @@ node{
     
     stage('K8S Deploy'){
      dir('employee-frontend') {
+        withKubeConfig(caCertificate: '', clusterName: '', contextName: '', credentialsId: 'JENKINS_DEPLOYER_ID', namespace: '', serverUrl: '') {
           sh "chmod +x changeTag.sh"
           sh "./changeTag.sh ${shortCommit}"
-          sh "kubectl apply -f angular-app-k8s-tagged.yml"   
+          sh "kubectl apply -f angular-app-k8s-tagged.yml"
+        }
+             
      }
     }
 }
