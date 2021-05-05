@@ -47,7 +47,14 @@ spec:
             - name: MONGO_HOST
               value: mongodb
             - name: MONGODB_URI
-              value: mongodb://mongo:27017/test
+              value: mongodb://mongodb:27017/test
           ports:
             - containerPort: 8000
               protocol: TCP
+          resources:
+            requests:
+              memory: "50Mi"
+              cpu: "500m"
+            limits:
+              memory: "500Mi"
+              cpu: "2000m"

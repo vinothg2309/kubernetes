@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: employee-secret
+  namespace: monitoring
+data:
+  MONGO_URI: bW9uZ29kYjovL21vbmdvZGI6MjcwMTcvdGVzdA==
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: employee-service
+  namespace: monitoring
+spec:
+  selector:
+    appname: employee-pod
+  type: NodePort
+  ports:
+    - name: employee-port
+      nodePort: 30001
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee
+  labels:
+    name: employee
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      appname: employee-pod
+  template:
+    metadata:
+      name: employee-pod
+      labels:
+        appname: employee-pod
+    spec:
+      containers:
+        - name: employee-container
+          image: vinothg2309/employee-service
+          env:
+            - name: MONGO_DB_NAME
+              value: test
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_HOST
+              value: mongodb
+            - name: MONGODB_URI
+              value: mongodb://mongo:27017/test
+          ports:
+            - containerPort: 8000
+              protocol: TCP
